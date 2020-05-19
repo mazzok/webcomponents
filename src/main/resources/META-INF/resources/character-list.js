@@ -22,17 +22,14 @@ template.innerHTML = /*html*/ `
         color: #000;
         background-color: #4e4;
       }
+
       button {
         display: block;
         padding: 12px;
         width: 100%;
       }
 </style>
-
-<section>
-</section>
-<slot></slot>
-
+<section></section>
 `;
 
 class CharacterList extends HTMLElement {
@@ -48,16 +45,6 @@ class CharacterList extends HTMLElement {
     this.characterListSection = this.shadowRoot.querySelector("section");
   }
 
-  connectedCallback() {
-    // fetch("http://localhost:8080/hello")
-    //   .then((res) => res.json())
-    //   .then((data) => {
-    //     console.log(data);
-    //     this.characters = data;
-    //     // characterDetailsComponent.character = data[0];
-    //   });
-  }
-
   /**
    * @function
    * @param {any[]} e
@@ -71,17 +58,12 @@ class CharacterList extends HTMLElement {
   _render() {
     this._characters.forEach((character, index) => {
       console.log("creating buttin for ", character.name);
-      const dragDiv = document.createElement("div");
-      if (index == 1) {
-        dragDiv.setAttribute("id", "yes-drop");
-      } else {
-        dragDiv.setAttribute("id", index.toString());
-      }
-      dragDiv.setAttribute("class", "drag-drop");
-      // <div id="yes-drop" class="drag-drop"> #yes-drop </div>
+      const draggableCharacter = document.createElement("draggable-character");
+      draggableCharacter.setAttribute("id", "dropable");
+      draggableCharacter.setAttribute("class", "drag-drop");
+      draggableCharacter.character = character;
       const button = document.createElement("button");
-      button.innerText = character.name;
-      // button.appendChild(document.createTextNode(character.name));
+      button.appendChild(document.createTextNode(character.name));
       button.addEventListener("click", () => {
         console.log("click event for character dispatched");
         this.dispatchEvent(
@@ -92,9 +74,8 @@ class CharacterList extends HTMLElement {
           })
         );
       });
-      dragDiv.appendChild(button);
-      dragDiv.innerText = character.name;
-      this.characterListSection.appendChild(dragDiv);
+      draggableCharacter.appendChild(button);
+      this.characterListSection.appendChild(draggableCharacter);
     });
   }
 
@@ -105,12 +86,12 @@ class CharacterList extends HTMLElement {
 
 customElements.define("x-character-list", CharacterList);
 
-var drag_pos = { x: 0, y: 0 };
 function dragging(event) {
   var target = event.target;
   // keep the dragged position in the data-x/data-y attributes
   var x = (parseFloat(target.getAttribute("data-x")) || 0) + event.dx;
   var y = (parseFloat(target.getAttribute("data-y")) || 0) + event.dy;
+  // console.log("dragged X:", x, " Y: ", y);
 
   // translate the element
   target.style.webkitTransform = target.style.transform =
@@ -133,7 +114,7 @@ interact(".drag-drop").draggable({
   inertia: true,
   modifiers: [
     interact.modifiers.restrictRect({
-      restriction: "parent",
+      restriction: "self",
       endOnly: true,
     }),
   ],

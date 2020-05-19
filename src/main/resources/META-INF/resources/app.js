@@ -45,6 +45,18 @@ class App extends HTMLElement {
     this.characterListComponent = this.shadowRoot.querySelector(
       "x-character-list"
     );
+    this.characterDetailsComponent = this.shadowRoot.querySelector(
+      "x-character-details"
+    );
+
+    this.characterListComponent.addEventListener("selectCharacter", (event) =>
+      this.buttonClicked(event)
+    );
+  }
+
+  buttonClicked(event) {
+    console.log("button clicked event received");
+    this.characterDetailsComponent.character = event.detail;
   }
 
   connectedCallback() {
@@ -53,7 +65,7 @@ class App extends HTMLElement {
       .then((data) => {
         console.log("data fetched: ", data);
         this.characterListComponent.characters = data;
-        // characterDetailsComponent.character = data[0];
+        this.characterDetailsComponent.character = data[0];
       });
   }
 }
