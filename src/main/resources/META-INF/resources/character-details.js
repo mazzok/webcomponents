@@ -72,11 +72,9 @@ class CharacterDetails extends HTMLElement {
       event.target.classList.remove("drop-target");
       event.relatedTarget.classList.remove("can-drop");
     },
-    ondrop: (e) => {
-      console.log("event dispatched: ", e.relatedTarget.character);
-      this.dispatchEvent(
-        new CustomEvent("customEvent", { detail: e.relatedTarget.character })
-      );
+    ondrop: (event) => {
+      console.log("event dispatched: ", event.relatedTarget.character);
+      this.onDropAction(event.relatedTarget.character);
     },
     ondropdeactivate: function (event) {
       console.log("ondropdeactivate");
@@ -94,11 +92,6 @@ class CharacterDetails extends HTMLElement {
   }
 
   connectedCallback() {
-    this.addEventListener("customEvent", (e) => {
-      console.log("custom event received:", e.detail);
-      this.onDropAction(e.detail);
-    });
-
     interact(this.innerDropZone).dropzone(this._dropZoneInteraction);
   }
 
@@ -108,17 +101,17 @@ class CharacterDetails extends HTMLElement {
     return li;
   }
 
-  onDropAction(event) {
-    console.log("Droped target:", JSON.stringify(event));
+  onDropAction(character) {
+    console.log("Droped target:", JSON.stringify(character));
     this.shadowRoot
       .querySelector("#draggedintolist")
-      .appendChild(this.createMenuItem("Name", `${event.name}`));
+      .appendChild(this.createMenuItem("Name", `${character.name}`));
     this.shadowRoot
       .querySelector("#draggedintolist")
-      .appendChild(this.createMenuItem("Height", `${event.height}`));
+      .appendChild(this.createMenuItem("Height", `${character.height}`));
     this.shadowRoot
       .querySelector("#draggedintolist")
-      .appendChild(this.createMenuItem("Age", `${event.age}`));
+      .appendChild(this.createMenuItem("Age", `${character.age}`));
   }
 
   get character() {
@@ -147,4 +140,3 @@ class CharacterDetails extends HTMLElement {
 }
 
 customElements.define("x-character-details", CharacterDetails);
-
